@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
@@ -44,4 +45,27 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    static public function getAdmin(){
+        $return = self::select('users.*')->where('user_type', '=', 1)->where('is_delete', '=', '0');
+
+                            if(request()->has('name') && !empty(request()->get('name')))
+                            {
+                                $return = $return->where('name', 'like', '%'.request()->get('name').'%');
+                            }
+                            if(request()->has('email') && !empty(request()->get('email')))
+                            {
+                                $return = $return->where('email', 'like', '%'.request()->get('email').'%');
+                            }
+                            $return = $return->orderBy('id', 'desc')->paginate(2);
+
+                            return $return;
+    }
+
+
+    static public function getSingle($id){
+        return self::find($id);
+    }
+
+
 }
